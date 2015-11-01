@@ -46,13 +46,11 @@ public abstract class GenericDao<EntityType, DataType> {
         return null;
     }
 
-    public List<DataType> retrieveAll() {
+    public List<DataType> retrieveAll(String queryString) {
         EntityTransaction transaction = entityManager.getTransaction();
         List<DataType> result = new ArrayList<>();
 
         try {
-            String queryString = "SELECT c FROM EntityType c";
-
             transaction.begin();
 
             Query query = entityManager.createQuery(queryString);

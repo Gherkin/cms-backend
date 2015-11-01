@@ -23,7 +23,8 @@ public class ContentDao extends GenericDao<ContentEntity, Content> {
     }
 
     public Map<String, Content> retrieveAllMap() {
-        List<Content> contentList = retrieveAll();
+        String queryString = "SELECT c FROM ContentEntity c";
+        List<Content> contentList = retrieveAll(queryString);
         Map<String, Content> result = new HashMap<>();
 
         for(Content content : contentList) {
