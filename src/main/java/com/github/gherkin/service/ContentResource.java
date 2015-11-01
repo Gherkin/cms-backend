@@ -15,6 +15,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import java.util.HashMap;
@@ -25,9 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Path("content")
 public class ContentResource {
     @Inject
-    static Map<String, Content> contentMap;
+    private Map<String, Content> contentMap;
     @Inject
-    static AtomicInteger nextId;
+    private Incrementor nextId;
     @Inject
     private ContentDao dao;
     @Inject
@@ -35,26 +36,35 @@ public class ContentResource {
 
 
     @GET
-    public Map<String, Content> fetchAll() {
-        return dao.retrieveAllMap();
+    public String fetchall() {//Map<String, Content> fetchAll() {
+//        return dao.retrieveAllMap();
+        return "helo;";
     }
 
     @GET
     @Path("{id}")
     public Content fetch(@PathParam("id") String id) {
+        try {
+            return getContent(id);
+        } catch(NullPointerException e) {
+            e.printStackTrace();
+            throw new WebApplicationException(Status.NOT_FOUND);
+        } catch(NumberFormatException e) {
+            e.printStackTrace();
+            throw new WebApplicationException("path parameter is not a number", Status.BAD_REQUEST);
+        }
+    }
+
+    private Content getContent(String id) throws NullPointerException, NumberFormatException {
         Content content;
         if(contentMap.containsKey(id)) {
             content = contentMap.get(id);
         } else {
-            try {
-                content = dao.retrieve(Integer.parseInt(id));
-                if(content == null) {
-                    throw new WebApplicationException(Status.NOT_FOUND);
-                }
-                contentMap.put(content.get("id"), content);
-            } catch(NumberFormatException exception) {
-                throw new WebApplicationException("path parameter is not a number", Status.BAD_REQUEST);
+            content = dao.retrieve(Integer.parseInt(id));
+            if(content == null) {
+                throw new WebApplicationException(Status.NOT_FOUND);
             }
+            contentMap.put(content.get("id"), content);
         }
 
         return content;
@@ -64,8 +74,14 @@ public class ContentResource {
     @Path("changelog/{id}")
     public Map<String, Content> getChangeLog(@PathParam("id") int id) {
         Map<String, Content> cache = new HashMap<>();
-        for (int i = id; i < changeLog.size(); i++) {
-            cache.put(changeLog.get(i), contentMap.get(changeLog.get(i)));
+        for (String contentId : changeLog.get(id)) {
+            try {
+                cache.put(contentId, getContent(contentId));
+            } catch(Exception e) {
+                System.err.println(String.format("Error getting changelog using id=%s", contentId));
+                e.printStackTrace();
+                throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+            }
         }
 
         return cache;
@@ -112,15 +128,15 @@ public class ContentResource {
         return content;
     }
 
-    public static Map<String, Content> getContentMap() {
+    public Map<String, Content> getContentMap() {
         return contentMap;
     }
 
-    public static void setNextId(AtomicInteger nextId) {
-        ContentResource.nextId = nextId;
+    public void setNextId(Incrementor nextId) {
+        this.nextId = nextId;
     }
 
-    public static void setContentMap(Map<String, Content> contentMap) {
-        ContentResource.contentMap = contentMap;
+    public void setContentMap(Map<String, Content> contentMap) {
+        this.contentMap = contentMap;
     }
 }
