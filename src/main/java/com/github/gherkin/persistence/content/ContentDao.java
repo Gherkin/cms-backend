@@ -1,25 +1,21 @@
 package com.github.gherkin.persistence.content;
 
 import com.github.gherkin.Content;
-import com.github.gherkin.persistence.GenericDao;
+import com.github.gherkin.persistence.GenericSqlDao;
+import com.google.inject.Inject;
 
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ContentDao extends GenericDao<ContentEntity, Content> {
-
+public class ContentDao extends GenericSqlDao<ContentEntity, Content> {
+    @Inject
     EntityManager entityManager;
 
-    public ContentDao() {
-        EntityManager entityManager = super.entityManagerFactory.createEntityManager();
-    }
-
-    @Override
-    public Content retrieve(int id) {
-        ContentEntity entity = entityManager.find(ContentEntity.class, id);
-        return entityToData(entity);
+    public @Inject ContentDao() {
+        super(ContentEntity.class);
     }
 
     public Map<String, Content> retrieveAllMap() {
@@ -31,6 +27,11 @@ public class ContentDao extends GenericDao<ContentEntity, Content> {
         }
 
         return result;
+    }
+
+    public List<Content> retrieveAll() {
+        String queryString = "SELECT c FROM ContentEntity c";
+        return retrieveAll(queryString);
     }
 
     @Override

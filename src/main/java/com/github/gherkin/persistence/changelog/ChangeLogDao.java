@@ -1,10 +1,19 @@
 package com.github.gherkin.persistence.changelog;
 
-import com.github.gherkin.persistence.GenericDao;
+import com.github.gherkin.persistence.GenericSqlDao;
 
 import java.util.List;
 
-public class ChangeLogDao extends GenericDao<ChangeLogEntry, String> {
+public class ChangeLogDao extends GenericSqlDao<ChangeLogEntry, String> {
+
+    public ChangeLogDao() {
+        super(ChangeLogEntry.class);
+    }
+
+    public List<String> retrieveAll() {
+        String queryString = "SELECT c FROM ChangeLogEntry c";
+        return super.retrieveAll(queryString);
+    }
 
     @Override
     protected ChangeLogEntry dataToEntity(String data) {

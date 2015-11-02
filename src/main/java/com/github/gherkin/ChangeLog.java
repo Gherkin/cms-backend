@@ -3,20 +3,18 @@ package com.github.gherkin;
 import com.github.gherkin.persistence.changelog.ChangeLogDao;
 import com.google.inject.Inject;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class ChangeLog extends ArrayList<String> {
+public class ChangeLog {
+    @Inject
     ChangeLogDao dao;
 
-    @Inject
-    public ChangeLog(ChangeLogDao dao) {
-        this.dao = dao;
-        this.addAll(dao.retrieveAll());
+    public void add(String s) {
+        dao.save(s);
     }
 
-    @Override
-    public boolean add(String s) {
-        dao.save(s);
-        return super.add(s);
+    public List<String> get(int i) {
+        List<String> changeLog = dao.retrieveAll();
+        return changeLog.subList(i, changeLog.size() - 1);
     }
 }
