@@ -33,9 +33,8 @@ public class ContentResource {
 
 
     @GET
-    public String fetchall() {//Map<String, Content> fetchAll() {
-//        return dao.retrieveAllMap();
-        return "helo;";
+    public Map<String, Content> fetchAll() {
+        return dao.retrieveAllMap();
     }
 
     @GET

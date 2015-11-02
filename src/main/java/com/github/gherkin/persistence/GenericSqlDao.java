@@ -7,6 +7,7 @@ import com.google.inject.name.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
+import javax.validation.constraints.Null;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public abstract class GenericSqlDao<EntityType, DataType>{
         }
     }
 
-    public DataType retrieve(int id) {
+    public DataType retrieve(int id) throws NullPointerException {
         EntityType entity = entityManager.find(type, id);
         return entityToData(entity);
     }
@@ -78,13 +79,16 @@ public abstract class GenericSqlDao<EntityType, DataType>{
         return result;
     }
 
-    public void remove(int id) {
+    public void remove(int id) throws NullPointerException{
         EntityTransaction transaction = entityManager.getTransaction();
         try {
-            DataType data = retrieve(id);
-            EntityType entity = dataToEntity(data);
-
             transaction.begin();
+            EntityType entity = entityManager.find(type, id);
+
+            if(entity == null) {
+                throw new NullPointerException();
+            }
+
             entityManager.remove(entity);
             transaction.commit();
 
