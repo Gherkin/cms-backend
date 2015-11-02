@@ -11,16 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 public class ContentDao extends GenericSqlDao<ContentEntity, Content> {
-    @Inject @Named("sql")
+    @Inject
     EntityManager entityManager;
 
-    public ContentDao(Class<ContentEntity> type) {
+    public @Inject ContentDao() {
         super(ContentEntity.class);
     }
 
     public Map<String, Content> retrieveAllMap() {
-        String queryString = "SELECT c FROM ContentEntity c";
-        List<Content> contentList = retrieveAll(queryString);
+        List<Content> contentList = retrieveAll();
         Map<String, Content> result = new HashMap<>();
 
         for(Content content : contentList) {
@@ -28,6 +27,11 @@ public class ContentDao extends GenericSqlDao<ContentEntity, Content> {
         }
 
         return result;
+    }
+
+    public List<Content> retrieveAll() {
+        String queryString = "SELECT c FROM ContentEntity c";
+        return retrieveAll(queryString);
     }
 
     @Override

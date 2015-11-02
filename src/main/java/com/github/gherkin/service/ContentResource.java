@@ -23,8 +23,7 @@ import java.util.Map;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("content")
 public class ContentResource {
-    @Inject
-    private Map<String, Content> contentMap;
+    static Map<String, Content> contentMap = new HashMap<>();
     @Inject
     private Incrementor nextId;
     @Inject
@@ -92,6 +91,7 @@ public class ContentResource {
             throw new WebApplicationException("content missing", Status.BAD_REQUEST);
 
         content.put("id", "" + nextId.incrementAndGet());
+        System.out.println(content.get("id"));
         contentMap.put(content.get("id"), content);
         dao.save(content);
         changeLog.add(content.get("id"));
@@ -135,6 +135,6 @@ public class ContentResource {
     }
 
     public void setContentMap(Map<String, Content> contentMap) {
-        this.contentMap = contentMap;
+        ContentResource.contentMap = contentMap;
     }
 }

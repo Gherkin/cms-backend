@@ -2,6 +2,7 @@ package com.github.gherkin;
 
 import com.github.gherkin.persistence.content.ContentDao;
 import com.github.gherkin.service.ContentResource;
+import com.github.gherkin.service.Incrementor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,8 +34,8 @@ public class ContentResourceTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
-        ContentResource.setNextId(new AtomicInteger());
-        ContentResource.setContentMap(new HashMap<String, Content>());
+        target.setNextId(new Incrementor());
+        target.setContentMap(new HashMap<String, Content>());
     }
 
     @Test
@@ -78,7 +79,7 @@ public class ContentResourceTest {
 
         target.update("1", input);
 
-        Map<String, Content> contentMap = ContentResource.getContentMap();
+        Map<String, Content> contentMap = target.getContentMap();
         Content output = contentMap.get("1");
 
         assertEquals(input, output);
@@ -102,7 +103,7 @@ public class ContentResourceTest {
 
         target.remove("1");
 
-        Map<String, Content> contentMap = ContentResource.getContentMap();
+        Map<String, Content> contentMap = target.getContentMap();
 
         assertTrue("input content shouldnt exist", !contentMap.containsKey("1"));
     }
@@ -125,7 +126,7 @@ public class ContentResourceTest {
 
         Map<String, Content> contentMap = new HashMap<>();
         contentMap.put("1", input);
-        ContentResource.setContentMap(contentMap);
+        target.setContentMap(contentMap);
 
         return input;
     }

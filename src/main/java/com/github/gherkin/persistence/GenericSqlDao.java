@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GenericSqlDao<EntityType, DataType>{
-    @Inject @Named("sql")
+    @Inject
     private EntityManager entityManager;
     private Class<EntityType> type;
 
@@ -53,7 +53,7 @@ public abstract class GenericSqlDao<EntityType, DataType>{
         return entityToData(entity);
     }
 
-    public List<DataType> retrieveAll(String queryString) {
+    protected List<DataType> retrieveAll(String queryString) {
         EntityTransaction transaction = entityManager.getTransaction();
         List<DataType> result = new ArrayList<>();
 
